@@ -1,5 +1,13 @@
 import "./utils/env.js";
-import { startTime, memoryUsage, updateCandlesArr, calcOhlc } from "./utils/functions.js";
+import {
+    startTime,
+    memoryUsage,
+    updateCandlesArr,
+    calcOhlc4,
+    calcSMA,
+    calcShortMA,
+    calcLongMA
+} from "./utils/functions.js";
 import state from "./state.js";
 import { exchange } from "./exchanges/exchange.js";
 
@@ -11,7 +19,10 @@ export const app = {
         exchangeWs = exchange.loadWebsocket(process.env.EXCHANGE);
         exchangeWs.onCandles((e) => {
             state.candles = updateCandlesArr(e.symbol, e.candles);
-            state.OHLC4 = calcOhlc(state.candles);
+            state.OHLC4 = calcOhlc4(state.candles);
+            state.SMA = calcSMA(process.env.SMA_LEN);
+            state.LongMA = calcLongMA();
+            state.ShortMA = calcShortMA();
         })
     },
 
@@ -26,8 +37,11 @@ export const app = {
     printConsole: () => {
         console.clear();
         app.printBanner();
-        console.log('candles:', state.candles);
+        console.log('candles:', state.candles.length > 0 ? state.candles[0] : state.candles);
         console.log('OHLC4:', state.OHLC4);
+        console.log('SMA:', state.SMA);
+        console.log('ShortMA:', state.ShortMA);
+        console.log('LongMA:', state.LongMA);
     },
 
     run: () => {

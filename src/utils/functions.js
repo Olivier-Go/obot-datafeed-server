@@ -45,6 +45,15 @@ const formatCandle = (symbol, candle) => (
     }
 )
 
+const formatOhlc4 = (candle, value) => (
+    {
+        symbol: candle.symbol,
+        timecycleMs: candle.timecycleMs,
+        timecycleDate: candle.timecycleDate,
+        value
+    }
+)
+
 export const updateCandlesArr = (symbol, kline) => {
     const candle = formatCandle(symbol, kline);
     let result = [candle];
@@ -58,12 +67,47 @@ export const updateCandlesArr = (symbol, kline) => {
     return result;
 }
 
-export const calcOhlc = () => {
+export const calcOhlc4 = () => {
     let arr = [...state.candles];
+    let result = [...state.OHLC4];
     if (arr.length > 1) {
         arr.shift();
         const candle = arr[0];
-        return (parseFloat(candle.open) + parseFloat(candle.high) + parseFloat(candle.low) + parseFloat(candle.close)) / 4;
+        const value = parseFloat(((parseFloat(candle.open) + parseFloat(candle.high) + parseFloat(candle.low) + parseFloat(candle.close)) / 4).toFixed(4));
+        const ohlc4 = formatOhlc4(candle, value);
+        let exist = false;
+        state.OHLC4.map((o) => {
+            if (o.timecycleMs === ohlc4.timecycleMs) exist = true;
+        })
+        if (!exist) result.push(ohlc4);
+    }
+    result.sort((a, b) => parseFloat(b.timecycleMs) - parseFloat(a.timecycleMs));
+    if (result.length > 3) result.pop();
+    return result;
+}
+
+export const calcSMA = (len) => {
+    let arr = [...state.OHLC4];
+    let sum = 0;
+    if (arr.length >= len) {
+        for (let i = 0; i < len; i++) {
+            sum += arr[i].value;
+        }
+        return parseFloat((((sum / len) * process.env.TICK_MULTIPLIER) / process.env.TICK_MULTIPLIER).toFixed(4));
+    }
+    return null;
+}
+
+export const calcShortMA = () => {
+    if (state.SMA) {
+        return parseFloat(((state.SMA * ((100 + parseFloat(process.env.SHORT_LEVEL)) / 100) * process.env.TICK_MULTIPLIER) / process.env.TICK_MULTIPLIER).toFixed(4));
+    }
+    return null;
+}
+
+export const calcLongMA = () => {
+    if (state.SMA) {
+        return parseFloat(((state.SMA * ((100 + parseFloat(process.env.LONG_LEVEL)) / 100) * process.env.TICK_MULTIPLIER) / process.env.TICK_MULTIPLIER).toFixed(4));
     }
     return null;
 }
