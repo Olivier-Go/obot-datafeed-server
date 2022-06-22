@@ -1,5 +1,5 @@
 import './../utils/env.js';
-import { openCandles } from './../websocket/websocket.js';
+import { openCandles } from './../websocket/client.js';
 import axios from "axios";
 
 export default class {
