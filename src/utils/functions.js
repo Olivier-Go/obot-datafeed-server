@@ -1,5 +1,10 @@
 import state from "./../state.js";
 
+export const debug = (data) => {
+    console.log(data);
+    process.exit();
+}
+
 export const isEmptyObj = (obj) => (
     Object.keys(obj).length === 0
 )
