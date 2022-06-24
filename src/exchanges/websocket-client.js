@@ -1,5 +1,7 @@
 import ReconnectingWebSocket from "reconnecting-websocket";
 import WS from "ws";
+import { updateOB, existingOrder } from "../utils/functions.js";
+import { debug } from "./../utils/functions.js";
 
 const openWebSocket = (url) => (
     new Promise((resolve, reject) => {
@@ -34,25 +36,36 @@ const subscribe = (topic, symbol, type = null) => {
     })
 }
 
-export const openCandles = async (endpoint, symbol, type, cb, state) => {
+export const open = async (endpoint, symbol, type, candlesCB, l2updateCB, state) => {
+    let ask = {};
+    let bid = {};
     const w = await openWebSocket(endpoint);
 
     w.onmessage = (msg) => {
         let msg_data = JSON.parse(msg.data);
 
-        // Connect or Reconnect fire the subscribe!
         if (msg_data.type === "welcome") {
             state('Connected');
-            //Add heartbeat
             setInterval(() => {
                 w.send(ping());
             }, 20000)
-            // Subscribe
             w.send(subscribe("/market/candles:", symbol, type));
+            w.send(subscribe("/spotMarket/level2Depth5:", symbol));
         }
 
         if (msg_data.type === "message") {
-            cb(msg_data.data);
+            if (msg_data.subject.includes('candles')) {
+                candlesCB(msg_data.data);
+            }
+            if (msg_data.subject.includes('level2')) {
+                const { asks, bids } = msg_data.data;
+                ask = updateOB(asks);
+                bid = updateOB(bids);
+                const orderbook = { ask, bid, timestamp: msg_data.data.timestamp};
+                if (!existingOrder(orderbook)) {
+                    l2updateCB(orderbook);
+                }
+            }
         }
     }
 

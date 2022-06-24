@@ -1,5 +1,5 @@
 import './../utils/env.js';
-import { openCandles } from './websocket-client.js';
+import { open } from './websocket-client.js';
 import axios from "axios";
 
 export default class {
@@ -17,12 +17,15 @@ export default class {
         let endpoint = response.data.instanceServers[0].endpoint;
         return `${endpoint}?token=${token}&[connectId=${Date.now()}]`;
     }
-    async onCandles(callback) {
+
+    async onMessage(candlesCB, l2updateCB) {
         let endpoint = await this.getSocketEndpoint();
-        return await openCandles(
+        return await open(
             endpoint,
             process.env.KUCOIN_SYMBOL,
-            process.env.KUCOIN_TYPE, callback,
+            process.env.KUCOIN_TYPE,
+            candlesCB,
+            l2updateCB,
             (e) => this.state = e
         );
     }

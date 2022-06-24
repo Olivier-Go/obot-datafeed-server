@@ -36,6 +36,28 @@ export const memoryUsage = () => (
     Math.round(process.memoryUsage().heapUsed / 1024 / 1024 * 100) / 100
 )
 
+export const updateOB = (arr) => {
+    let result = {};
+    if (arr.length) {
+        result = {
+            price: parseFloat(arr.slice(0, 1).shift()[0]),
+            size: parseFloat(arr.slice(0, 1).shift()[1]),
+        }
+    }
+    return result;
+}
+
+export const existingOrder = (orderbook) => {
+    return (
+        state.orderbook.ask && orderbook.ask &&
+        state.orderbook.ask.price === orderbook.ask.price &&
+        state.orderbook.ask.size === orderbook.ask.size &&
+        state.orderbook.bid && orderbook.bid &&
+        state.orderbook.bid.price === orderbook.bid.price &&
+        state.orderbook.bid.size === orderbook.bid.size
+    );
+}
+
 const formatCandle = (symbol, candle) => (
     {
         symbol,

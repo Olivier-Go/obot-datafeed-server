@@ -1,5 +1,6 @@
 export default {
     startTime: 0,
+    orderbook: {},
     candles: [],
     OHLC4: [],
     SMA: null,

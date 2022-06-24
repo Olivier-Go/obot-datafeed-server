@@ -60,11 +60,11 @@ export const websocketServer = {
     pushData: () => {
         if (websocketServer.infos.clients.size && state.ShortMA && state.LongMA) {
             const data = {
-                lastCandle: state.candles.length > 0 ? state.candles[0] : {},
-                OHLC4: state.OHLC4.length > 0 ? state.OHLC4[0] : {},
+                orderbook: state.orderbook,
+                OHLC4: state.OHLC4.length > 0 ? state.OHLC4[0] : null,
                 SMA: state.SMA,
-                ShortMA: state.ShortMA,
-                LongMA: state.LongMA
+                shortMA: state.ShortMA,
+                longMA: state.LongMA
             }
             websocketServer.infos.clients.forEach(ws => {
                 ws.send(JSON.stringify(data));

@@ -2,10 +2,10 @@
   "name": "obot-datafeed-server",
   "version": "1.0.0",
   "description": "",
-  "main": "src/app.js",
+  "main": "src/datafeed-app.js",
   "type": "module",
   "scripts": {
-    "start": "nodemon src/app.js"
+    "start": "nodemon src/datafeed-app.js \"console\""
   },
   "dependencies": {
     "axios": "^0.27.2",
