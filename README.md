@@ -1,6 +1,8 @@
 # obot-datafeed-server
 ### Datafeed websocket server for [oBot](https://github.com/Olivier-Go/obot-sf-backend)
 
+![screenshot](screenshot.png)
+
 ```sh
 # install dependencies
 yarn
